@@ -546,11 +546,16 @@ $_SESSION['HTTP_DIR'] = $dir;
 					url : "lib/AJAX/updateStatus.php",
 					data : $("#editForm").serialize(),
 					success : function(result) {
-
+						if(result == "ERR_PERM")
+						{
+							$("#alerts").html("<div class=\"alert alert-danger fade in\"> <strong>&#9888;</strong> You don't have permission to do that.");
+						}else{
+							
+						}
 						reloadData();
 						$("#editGo").prop('disabled', false);
 						$("#setStatus").modal('hide');
-						$("#alerts").html("<div class=\"alert alert-success fade in\"> <strong>&#x2714;</strong> Updated user.");
+						
 						window.setTimeout(function() {
 							$(".alert").fadeTo(500, 0).slideUp(500, function() {
 								$(this).remove();
