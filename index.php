@@ -46,17 +46,18 @@ $_SESSION['HTTP_DIR'] = $dir;
 </head>
 <body>
 <style>
-	
 </style>
 
 
  <script>
-	
-
-$(document).on({
-    ajaxStart: function() {  $("#loader").show();},
-     ajaxStop: function() { $("#loader").hide(); }    
-});
+	$(document).on({
+		ajaxStart : function() {
+			$("#loader").show();
+		},
+		ajaxStop : function() {
+			$("#loader").hide();
+		}
+	});
 
 	 </script>
 	<center>
@@ -357,23 +358,27 @@ $(document).on({
 			$("#loader").hide();
 			$("#start").val("0");
 			$("#end").val("5");
-			$("#loadMore").click(function(){
+			$("#loadMore").click(function() {
 				var old_start = parseInt($("#start").val(), 10);
-				$("#start").val(old_start +5);
+				$("#start").val(old_start + 5);
 				var old_end = parseInt($("#end").val(), 10);
 				$("#end").val(old_end + 5);
-				$("html, body").animate({ scrollTop: $(document).height() }, 1000);
+				$("html, body").animate({
+					scrollTop : $(document).height()
+				}, 1000);
 				$.ajax({
-				type : "POST",
-				url : "lib/AJAX/getMoreStats.php",
-				data : $('#filters').serialize(),
-				success : function(result) {
-					
-					$("table tbody").append(result);
-					$("html, body").animate({ scrollTop: $(document).height() }, 1000);
-				}
-			});
-				
+					type : "POST",
+					url : "lib/AJAX/getMoreStats.php",
+					data : $('#filters').serialize(),
+					success : function(result) {
+
+						$("table tbody").append(result);
+						$("html, body").animate({
+							scrollTop : $(document).height()
+						}, 1000);
+					}
+				});
+
 			});
 			$("#expireDate").hide();
 			if ($("input[name='optAction']").val() == "kick") {
@@ -387,9 +392,11 @@ $(document).on({
 				url : "lib/AJAX/getStats.php",
 				data : $('#filters').serialize(),
 				success : function(result) {
-					
+
 					$("#resultTable").html(result);
-					$("html, body").animate({ scrollTop: $(document).height() }, 1000);
+					$("html, body").animate({
+						scrollTop : $(document).height()
+					}, 1000);
 					bindButtonClick();
 
 				}
@@ -412,7 +419,7 @@ $(document).on({
 				data : $('#filters').serialize(),
 				success : function(result) {
 					$("#resultTable").html(result);
-				
+
 					bindButtonClick();
 				}
 			});
@@ -424,21 +431,22 @@ $(document).on({
 				data : $('#filters').serialize(),
 				success : function(result) {
 					$("#resultTable").html(result);
-					
+
 					bindButtonClick();
 				}
 			});
 		});
 		$("#actionType").change(function(event) {
-			
-			
+
 			$.ajax({
 				type : "POST",
 				url : "lib/AJAX/getStats.php",
 				data : $('#filters').serialize(),
 				success : function(result) {
 					$("#resultTable").html(result);
-					$("html, body").animate({ scrollTop: $(document).height() }, 1000);
+					$("html, body").animate({
+						scrollTop : $(document).height()
+					}, 1000);
 					bindButtonClick();
 				}
 			});
@@ -469,7 +477,7 @@ $(document).on({
 			}
 		});
 		function bindButtonClick() {
-			
+
 			$(".testClass").click(function() {
 				triggerModal(this.id);
 			});
@@ -479,7 +487,7 @@ $(document).on({
 		}
 
 		function reloadData() {
-			
+
 			$.ajax({
 				type : "POST",
 				url : "lib/AJAX/getStats.php",
@@ -487,7 +495,9 @@ $(document).on({
 				success : function(result) {
 
 					$("#resultTable").html(result);
-					$("html, body").animate({ scrollTop: $(document).height() }, 1000);
+					$("html, body").animate({
+						scrollTop : $(document).height()
+					}, 1000);
 					bindButtonClick();
 
 				}
@@ -561,7 +571,7 @@ $(document).on({
 	$(".form_datetime").datetimepicker({
 		format : "dd MM yyyy - hh:ii",
 		defaultDate : date
-	});
+	}); 
 </script> 
 	
 	</body>
