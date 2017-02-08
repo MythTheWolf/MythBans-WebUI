@@ -45,5 +45,40 @@ class User {
 		}
 		return -1;
 	}
-
+	function getUUID($username)
+	{
+		$mySQL = new MySQL();
+		$con = $mySQL -> getConnection();
+		if ($con == null) {
+			die("SQL ERROR!");
+		}
+		$PC = new PlayerCache($con);
+		if ($PC -> getPlayerExact($username) == -1) {
+			return -1;
+		}
+		$UUID = $PC -> getPlayerExact($username);
+		return $UUID;
+	}
+	
+	
+	function getGroup($uuid)
+	{
+	    $mySQL = new MySQL();
+		$con = $mySQL -> getConnection();
+		if ($con == null) {
+			die("SQL ERROR!");
+		}
+		$PC = new PlayerCache($con);
+		if ($PC -> getPlayerExact($username) == -1) {
+			return -1;
+		}
+		$sth = $con -> prepare("SELECT * FROM MythBans_SiteUsers WHERE UUID = :uuid");
+		$name = $PC -> getPlayerExact($username);
+		$sth -> bindParam(':uuid', $name, PDO::PARAM_STR, 255);
+		$sth -> execute();
+		foreach ($sth->fetchAll() as $r) {
+			return $r['group'];
+		}
+		return -1;
+	}
 }

@@ -4,14 +4,12 @@
 
 
 
-
 foreach ($_POST as $key => $value) {
     $_POST[$key] = htmlspecialchars($value, ENT_QUOTES,"UTF-8");
 }
 			session_start();
 			include_once ($_SESSION['DIR']."lib/mySQL/MySQL.php");
 			include($_SESSION['DIR']."lib/configuration/config.php");
-			include($_SESSION['DIR']."lib/user/user.php");
 			include($_SESSION['DIR']."lib/javaPlugin/player/PlayerCache.php");
 			$dir = $_SESSION['HTTP_DIR'];
 			$mySQL = new MySQL();
@@ -63,6 +61,8 @@ foreach ($_POST as $key => $value) {
 					break;
 				case "Probation":
 					$act = "trial";
+				case "OK":
+					$act = "OK";
 			}
 			if($count > 0)
 			{
@@ -172,8 +172,7 @@ foreach ($_POST as $key => $value) {
 		<td>$reason</td>
 		<td>$exp</td>
 		<td>
-		<button type = 'button' class = 'btn btn-primary testClass' id='$real_UUID'>Set Status</button>
-		<button type = 'button' class = 'btn btn-warning moreOptionsButton' id='$real_UUID'>More options</button>
+		None
 		</td>
 		</tr>
 		";

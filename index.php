@@ -1,9 +1,10 @@
 <?php
-
-
 include ("lib/mySQL/MySQL.php");
+include ("lib/user/LibUser.php");
+include ("lib/javaPlugin/PlayerCache.php");
 $mySQL = new MySQL();
 $con = $mySQL -> getConnection();
+$PC = new PlayerCache($con);
 $d = dirname($_SERVER['SCRIPT_FILENAME']) . '/';
 if ($con == null) {
 	die("
@@ -17,6 +18,10 @@ include ("lib/configuration/config.php");
 include ("lib/user/user.php");
 
 session_start();
+if(isset($_GET['UUID']) || isset($_GET['STAFF_UUID']))
+{
+	$alt = true;
+}
 $_SESSION['DIR'] = dirname($_SERVER['SCRIPT_FILENAME']) . '/';
 $dir = str_replace($_SERVER['PHP_SELF'], "", strtok($_SERVER["REQUEST_URI"], '?'));
 $_SESSION['HTTP_DIR'] = $dir;
@@ -24,14 +29,13 @@ $_SESSION['HTTP_DIR'] = $dir;
 <!DOCTYPE HTML>
 <html>
 <head>
+	
 
 <!--- JQuery --->
-<script src="https://cdn.jsdelivr.net/jquery.loadingoverlay/latest/loadingoverlay.min.js"></script>
+
 		
         <link rel="stylesheet" type="text/css" media="screen" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" />
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-        <link href="./css/prettify-1.0.css" rel="stylesheet">
-        <link href="./css/base.css" rel="stylesheet">
         <link href="//cdn.rawgit.com/Eonasdan/bootstrap-datetimepicker/e8bddc60e73c1ec2475f827be36e1957af72e2ea/build/css/bootstrap-datetimepicker.css" rel="stylesheet">
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -75,7 +79,9 @@ $_SESSION['HTTP_DIR'] = $dir;
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#"><?php echo $config['SERVER-NAME']; ?></a>
+      <a class="navbar-brand" href="#"><?php echo $config['SERVER-NAME'];
+		echo $user['isLoggedIn'];
+ ?></a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
@@ -83,7 +89,7 @@ $_SESSION['HTTP_DIR'] = $dir;
       <ul class="nav navbar-nav">
 		  <li class="active"><a href="#"><i class="fa fa-home"></i> Home <span class="sr-only">(current)</span></a></li>
         <li><a href="#"><i class="fa fa-info-circle"></i> About Server..</a></li>
-        <?php if($user['isLoggedIn']){ ?>
+        <?php if($user['isLoggedIn'] == true){ ?>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-gear"></i> Admin <span class="caret"></span></a>
           <ul class="dropdown-menu">
@@ -94,8 +100,13 @@ $_SESSION['HTTP_DIR'] = $dir;
       </ul>
     
       <ul class="nav navbar-nav navbar-right">
-      
-        <li><a href="#" id="loginLink" name="loginLink"><i class="fa fa-key"></i> Login</a></li>
+      <?php
+	if ($user['isLoggedIn'] == false) {
+		echo "<li><a href=\"#\" id=\"loginLink\" name=\"loginLink\"><i class=\"fa fa-key\"></i> Login</a></li>";
+	} else {
+		echo "<li><a href=\"#\" id=\"logoutLink\" name=\"loginLink\"><i class=\"fa fa-sign-out\"></i> Log out</a></li>";
+	}
+	  ?>
     
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-info-circle"></i> More<span class="caret"></span></a>
@@ -103,6 +114,13 @@ $_SESSION['HTTP_DIR'] = $dir;
             <li><a href="#"><i class="fa fa-gavel"></i> Staff...</a></li>
             <li role="separator" class="divider"></li>
 			 <li><a href="#"><i class="fa fa-bug"></i> Report Bug...</a></li>
+			 <?php
+			 if ($user['isLoggedIn'] == true) {
+			 ?>
+			 <li><a href="#" id="changePass"><i class="fa fa-pencil"></i> Change password..</a></li>
+			 <?php
+			 }
+			 ?>
           </ul>
         </li>
       </ul>
@@ -110,11 +128,24 @@ $_SESSION['HTTP_DIR'] = $dir;
   </div><!-- /.container-fluid -->
 </nav>
 <center>
+	<?php
+	if($alt != true){
+	?>
 	<h3>Live Stats</h3>
+	<?php 
+	}else if(isset($_GET['UUID'])){
+	?>
+	<h3>User profile of <?php echo $PC->getPlayerName($_GET['UUID']); ?></h3> 
+	<?php
+	}
+	?>
 </center>
 <div id="example" name="example"></div>
  <table class="table table-striped">
- 	
+ 	<?php
+ 	if($alt != true)
+	{
+		?>
  <div id="filterForm">
  	<form id="filters" name="filters" action="#">
  		<input type="text" id="start" name="start" hidden>
@@ -128,22 +159,53 @@ $_SESSION['HTTP_DIR'] = $dir;
       <input type="text" class="form-control" id="filterBy" name="filterBy" value="<?php echo $_GET['byUUID']; ?>">
     </div>
   <div class="form-group">
-  <label for="actionType">Action type:</label>
+  <label for="actionType">Status:</label>
   <select class="form-control" id="actionType" name="actionType">
    	<option>All</option>
     <option>Ban</option>
     <option>TempBan</option>
     <option>Mute</option>
     <option>Probation</option>
+    <option>OK</option>
   </select>
 </div>
  	</form>
- 	
+ 	<?php
+ 	}
+	if ($_SESSION['show_logout'] == true) {
+		echo("
+ 
+ 
+ 			$('#alerts').html('<div class=\'alert alert-success fade in\'> <strong>&#x2714;</strong> Operation Completed.');
+			window.setTimeout(function() {
+				$('.alert').fadeTo(500, 0).slideUp(500, function() {
+					$(this).remove();
+				});
+			}, 4000);
+		});
+ 
+ 
+ 
+ ");
+
+	}
+	?>
  	<script>
 		$(document).ready(function() {
+			$("#loader").hide();
 			$('#loginModal').modal('hide');
 			$("#loginLink").click(function() {
 				$('#loginModal').modal('show');
+			});
+			$("#logoutLink").click(function() {
+				$.ajax({
+					type : "POST",
+					url : "lib/AJAX/logOut.php",
+					success : function(result) {
+
+						location.reload();
+					}
+				});
 			});
 		});
 	 </script>
@@ -167,11 +229,11 @@ $_SESSION['HTTP_DIR'] = $dir;
         <h4 class="modal-title" id="loginModalLabel">System Login</h4>
       </div>
       <div class="modal-body">
-         <form class="form-horizontal" name="login" id="login">
+         <form class="form-horizontal" name="login" id="login" action="#">
 <fieldset>
 
 <!-- Form Name -->
-<legend></legend>
+
 
 <!-- Text input-->
 <div class="form-group">
@@ -361,7 +423,24 @@ $_SESSION['HTTP_DIR'] = $dir;
   </div>
 </div>
  
- 
+ <!-- PermaLink Modal -->
+<div class="modal fade" id="getPermaLink" tabindex="-1" role="dialog" aria-labelledby="getPermaLinkLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="getPermaLinkLabel">Perma-Link</h4>
+      </div>
+      <div class="modal-body">
+        <div id="permaLinkContent">
+</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" onclick='' data-dismiss="modal">Ok</button>
+      </div>
+    </div>
+  </div>
+</div>
  
  
  <div id="alerts" name="alerts">
@@ -375,20 +454,50 @@ $_SESSION['HTTP_DIR'] = $dir;
 	    </table>
 	    <div id="loader">
  		<center>
- 			<img src="lib/AJAX/CSS/loading.gif">
+ 			<img src="lib/AJAX/CSS/loading.gif" id="target" class="target">
  		</center>
  	</div>
-	    <a href="javascript:void(0);" id="loadMore" name="loadMore">Load more..</a>
+ 	<div>
+ 		<?php
+ 		if($alt != true){
+ 			?>
+ 	<center>
+	    <button id="loadMore" name="loadMore" type="button" class="btn btn-primary"><i class="fa fa-refresh fa-spin"></i> Load More Data</button>
+	    </center>
+	    </div>
+	    <?php
+		}
+		?>
+	    
+	    
 	    
 	<script>
+		function shakeForm() {
+			var l = 20;
+			for (var i = 0; i < 10; i++)
+				$(".modal-body").animate({
+					'margin-left' : "+=" + ( l = -l ) + 'px',
+					'margin-right' : "-=" + l + 'px'
+				}, 50);
+
+		}
+
+
 		$(document).ready(function() {
+			
 			$("#subLogin").click(function() {
+				$("#subLogin").prop('disabled', true);
 				$.ajax({
 					type : "POST",
 					url : "lib/AJAX/login.php",
 					data : $('#login').serialize(),
 					success : function(result) {
-						$("#subLogin").prop('disabled', true);
+						shakeForm();
+						if (result === "OK") {
+							$("#loginModal").modal('hide');
+							location.reload();
+						}
+						$("#subLogin").prop('disabled', false);
 					}
 				});
 			});
@@ -404,17 +513,17 @@ $_SESSION['HTTP_DIR'] = $dir;
 					scrollTop : $(document).height()
 				}, 1000);
 				$.ajax({
-		type : "POST",
-		url : "lib/AJAX/getMoreStats.php",
-		data : $('#filters').serialize(),
-		success : function(result) {
+					type : "POST",
+					url : "lib/AJAX/getMoreStats.php",
+					data : $('#filters').serialize(),
+					success : function(result) {
 
-		$("table tbody").append(result);
-		$("html, body").animate({
-		scrollTop : $(document).height()
-		}, 1000);
-		}
-		});
+						$("table tbody").append(result);
+						$("html, body").animate({
+							scrollTop : $(document).height()
+						}, 1000);
+					}
+				});
 
 			});
 			$("#expireDate").hide();
@@ -423,7 +532,9 @@ $_SESSION['HTTP_DIR'] = $dir;
 			}
 			$("#OptReasonDiv").hide();
 			bindButtonClick();
-
+			<?php
+	  	if($alt != true){
+	    ?>
 			$.ajax({
 				type : "POST",
 				url : "lib/AJAX/getStats.php",
@@ -431,21 +542,12 @@ $_SESSION['HTTP_DIR'] = $dir;
 				success : function(result) {
 
 					$("#resultTable").html(result);
-					
+
 					bindButtonClick();
 
 				}
 			});
 
-		});
-		$("input[name='optAction']").change(function() {
-
-			if (this.value == "kick") {
-
-				$("#OptReasonDiv").show();
-			} else {
-				$("#OptReasonDiv").hide();
-			}
 		});
 		$("#filterName").keyup(function(event) {
 			$.ajax({
@@ -479,12 +581,25 @@ $_SESSION['HTTP_DIR'] = $dir;
 				data : $('#filters').serialize(),
 				success : function(result) {
 					$("#resultTable").html(result);
-					
+
 					bindButtonClick();
 				}
 			});
 
 		});
+		<?php
+		}
+		?>
+			$("input[name='optAction']").change(function() {
+
+			if (this.value == "kick") {
+
+				$("#OptReasonDiv").show();
+			} else {
+				$("#OptReasonDiv").hide();
+			}
+		});
+		
 		$("#selectbasic").change(function(event) {
 			switch($("#selectbasic").val()) {
 			case "OK":
@@ -514,11 +629,20 @@ $_SESSION['HTTP_DIR'] = $dir;
 			$(".testClass").click(function() {
 				triggerModal(this.id);
 			});
+			$(".permaLink").click(function() {
+				alert("ll");
+				getPermaLink(this.id);
+			});
 			$(".moreOptionsButton").click(function() {
 				triggerOptions(this.id);
 			});
 		}
 
+		function getPermaLink(uuid)
+		{
+			$("#permaLinkContent").html(uuid);
+			$("#getPermaLink").modal("show");
+		}
 		function reloadData() {
 
 			$.ajax({
@@ -528,7 +652,7 @@ $_SESSION['HTTP_DIR'] = $dir;
 				success : function(result) {
 
 					$("#resultTable").html(result);
-					
+
 					bindButtonClick();
 
 				}
@@ -577,16 +701,15 @@ $_SESSION['HTTP_DIR'] = $dir;
 					url : "lib/AJAX/updateStatus.php",
 					data : $("#editForm").serialize(),
 					success : function(result) {
-						if(result == "ERR_PERM")
-						{
+						if (result == "ERR_PERM") {
 							$("#alerts").html("<div class=\"alert alert-danger fade in\"> <strong>&#9888;</strong> You don't have permission to do that.");
-						}else{
-							
+						} else {
+
 						}
 						reloadData();
 						$("#editGo").prop('disabled', false);
 						$("#setStatus").modal('hide');
-						
+
 						window.setTimeout(function() {
 							$(".alert").fadeTo(500, 0).slideUp(500, function() {
 								$(this).remove();
@@ -599,6 +722,7 @@ $_SESSION['HTTP_DIR'] = $dir;
 
 		}
 	</script>
+	
 	
 
 

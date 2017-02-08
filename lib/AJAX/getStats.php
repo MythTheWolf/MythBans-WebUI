@@ -3,17 +3,15 @@
 		
 
 
-
-
 foreach ($_POST as $key => $value) {
     $_POST[$key] = htmlspecialchars($value, ENT_QUOTES,"UTF-8");
 }
 			session_start();
 			include_once ($_SESSION['DIR']."lib/mySQL/MySQL.php");
 			include($_SESSION['DIR']."lib/configuration/config.php");
-			include($_SESSION['DIR']."lib/user/user.php");
 			include($_SESSION['DIR']."lib/javaPlugin/player/PlayerCache.php");
 			$dir = $_SESSION['HTTP_DIR'];
+			echo $dir;
 			$mySQL = new MySQL();
 			$con = $mySQL->getConnection();
 			$PC = new PlayerCache($con);
@@ -63,6 +61,8 @@ foreach ($_POST as $key => $value) {
 					break;
 				case "Probation":
 					$act = "trial";
+				case "OK":
+					$act = "OK";
 			}
 			if($count > 0)
 			{
@@ -91,7 +91,6 @@ foreach ($_POST as $key => $value) {
 			}
 		}
 	try{
-		echo $base.$suffix;
 		$pdo = $con;
 		$std = $pdo->prepare($base.$suffix." LIMIT 0, 10 ");
 		$std->execute();
@@ -119,7 +118,7 @@ foreach ($_POST as $key => $value) {
 		{
 			$name = $PC->getPlayerName($row['UUID']);
 			$real_UUID = $row['UUID'];
-			$tmp = $dir."user.php"."?name=".$name;
+			$tmp = $dir."?UUID=".$real_UUID;
 		$UUID = "<img src=\"".$dir."lib/javaPlugin/player/skin.php?u=$name&s=35&v=f\"> <a href=\"$tmp\">$name</a>";
 		switch($row['status']){
 			case "banned":
@@ -144,11 +143,11 @@ foreach ($_POST as $key => $value) {
 		}else{
 			if($row['byUUID'] == "CONSOLE")
 			{
-				$loc = $dir."staff.php"."?name=CONSOLE";
+				$loc = $dir."?STAFF_UUID=CONSOLE";
 				$by = "<img src=\"".$dir."lib/javaPlugin/player/skin.php?u=Hack&s=35&v=f\"> <a href=\"$loc\">CONSOLE</a>";
 			}else{
 			$tmp =  $PC->getPlayerName($row['byUUID']);
-				$loc = $dir."staff.php"."?name=".$tmp;
+				$loc = $dir."?STAFF_UUID=".$tmp;
 				$by = "<img src=\"".$dir."lib/javaPlugin/player/skin.php?u=$tmp&s=35&v=f\"> <a href=\"$loc\">$name</a>";
 			}
 		}
@@ -187,8 +186,7 @@ foreach ($_POST as $key => $value) {
 		<td>$reason</td>
 		<td>$exp</td>
 		<td>
-		<button type = 'button' class = 'btn btn-primary testClass' id='$real_UUID'>Set Status</button>
-		<button type = 'button' class = 'btn btn-warning moreOptionsButton' id='$real_UUID'>More options</button>
+		None
 		</td>
 		</tr>
 		";
