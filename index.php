@@ -1,4 +1,6 @@
 <?php
+
+
 include ("lib/mySQL/MySQL.php");
 $mySQL = new MySQL();
 $con = $mySQL -> getConnection();
@@ -165,11 +167,36 @@ $_SESSION['HTTP_DIR'] = $dir;
         <h4 class="modal-title" id="loginModalLabel">System Login</h4>
       </div>
       <div class="modal-body">
-         
+         <form class="form-horizontal" name="login" id="login">
+<fieldset>
+
+<!-- Form Name -->
+<legend></legend>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="username">Username</label>  
+  <div class="col-md-4">
+  <input id="username" name="username" type="text" placeholder="username" class="form-control input-md" required="">
+    
+  </div>
+</div>
+<br />
+<!-- Password input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="password">Password</label>
+  <div class="col-md-4">
+    <input id="password" name="password" type="password" placeholder="password" class="form-control input-md" required="">
+    
+  </div>
+</div>
+
+</fieldset>
+</form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" onclick='' data-toggle="modal" data-target="#loginModal">Close</button>
-        <button type="button" class="btn btn-success" onclick=''>Submit</button>
+        <button type="button" class="btn btn-success" onclick='' id="subLogin">Submit</button>
       </div>
     </div>
   </div>
@@ -355,6 +382,16 @@ $_SESSION['HTTP_DIR'] = $dir;
 	    
 	<script>
 		$(document).ready(function() {
+			$("#subLogin").click(function() {
+				$.ajax({
+					type : "POST",
+					url : "lib/AJAX/login.php",
+					data : $('#login').serialize(),
+					success : function(result) {
+						$("#subLogin").prop('disabled', true);
+					}
+				});
+			});
 			$("#loader").hide();
 			$("#start").val("0");
 			$("#end").val("5");
@@ -367,17 +404,17 @@ $_SESSION['HTTP_DIR'] = $dir;
 					scrollTop : $(document).height()
 				}, 1000);
 				$.ajax({
-					type : "POST",
-					url : "lib/AJAX/getMoreStats.php",
-					data : $('#filters').serialize(),
-					success : function(result) {
+		type : "POST",
+		url : "lib/AJAX/getMoreStats.php",
+		data : $('#filters').serialize(),
+		success : function(result) {
 
-						$("table tbody").append(result);
-						$("html, body").animate({
-							scrollTop : $(document).height()
-						}, 1000);
-					}
-				});
+		$("table tbody").append(result);
+		$("html, body").animate({
+		scrollTop : $(document).height()
+		}, 1000);
+		}
+		});
 
 			});
 			$("#expireDate").hide();
@@ -394,9 +431,7 @@ $_SESSION['HTTP_DIR'] = $dir;
 				success : function(result) {
 
 					$("#resultTable").html(result);
-					$("html, body").animate({
-						scrollTop : $(document).height()
-					}, 1000);
+					
 					bindButtonClick();
 
 				}
@@ -444,9 +479,7 @@ $_SESSION['HTTP_DIR'] = $dir;
 				data : $('#filters').serialize(),
 				success : function(result) {
 					$("#resultTable").html(result);
-					$("html, body").animate({
-						scrollTop : $(document).height()
-					}, 1000);
+					
 					bindButtonClick();
 				}
 			});
@@ -495,9 +528,7 @@ $_SESSION['HTTP_DIR'] = $dir;
 				success : function(result) {
 
 					$("#resultTable").html(result);
-					$("html, body").animate({
-						scrollTop : $(document).height()
-					}, 1000);
+					
 					bindButtonClick();
 
 				}

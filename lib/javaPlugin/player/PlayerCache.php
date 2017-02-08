@@ -18,14 +18,18 @@ class PlayerCache{
 	
 	function getPlayerExact($name)
 	{
-		$name2 = $name."%";
-		$std = $this->conn->prepare("SELECT * FROM MythBans_NameCache WHERE Name LIKE :Name ");
+		$name2 = $name;
+		$std = $this->conn->prepare("SELECT * FROM MythBans_NameCache WHERE Name = :Name ");
 		$std->bindParam(':Name', $name2);
 		$std->execute();
 		foreach($std->fetchAll() as $row)
 		{
+			
 			return $row['UUID'];
 		}
+		return -1;
 	}
+	
+	
 }
 ?>
