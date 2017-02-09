@@ -91,7 +91,7 @@ foreach ($_POST as $key => $value) {
 		}
 		try{
 		$pdo = $con;
-		$start  = $_POST['start'];
+		$start  = $_POST['start']+1;
 		$end = $_POST['end'];
 		$std = $pdo->prepare($base.$suffix."  ORDER BY ID DESC LIMIT $start, $end");
 		$std->execute();
