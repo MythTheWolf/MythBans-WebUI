@@ -1,17 +1,13 @@
 <?php 
 
-		
-
 
 foreach ($_POST as $key => $value) {
     $_POST[$key] = htmlspecialchars($value, ENT_QUOTES,"UTF-8");
 }
 			session_start();
-			include_once ($_SESSION['DIR']."lib/mySQL/MySQL.php");
 			include($_SESSION['DIR']."lib/configuration/config.php");
-			include($_SESSION['DIR']."lib/javaPlugin/player/PlayerCache.php");
+			include($_SESSION['DIR']."lib/user/User.php");
 			$dir = $_SESSION['HTTP_DIR'];
-			echo $dir;
 			$mySQL = new MySQL();
 			$con = $mySQL->getConnection();
 			$PC = new PlayerCache($con);
@@ -92,7 +88,7 @@ foreach ($_POST as $key => $value) {
 		}
 	try{
 		$pdo = $con;
-		$std = $pdo->prepare($base.$suffix." LIMIT 0, 10 ");
+		$std = $pdo->prepare($base.$suffix." ORDER BY ID DESC LIMIT 0, 10 ");
 		$std->execute();
 			
 			echo "
@@ -146,9 +142,9 @@ foreach ($_POST as $key => $value) {
 				$loc = $dir."?STAFF_UUID=CONSOLE";
 				$by = "<img src=\"".$dir."lib/javaPlugin/player/skin.php?u=Hack&s=35&v=f\"> <a href=\"$loc\">CONSOLE</a>";
 			}else{
-			$tmp =  $PC->getPlayerName($row['byUUID']);
-				$loc = $dir."?STAFF_UUID=".$tmp;
-				$by = "<img src=\"".$dir."lib/javaPlugin/player/skin.php?u=$tmp&s=35&v=f\"> <a href=\"$loc\">$name</a>";
+				$loc = $dir."?STAFF_UUID=".$row['byUUID'];
+				$tmp = $PC->getPlayerName($row['byUUID']);
+				$by = "<img src=\"".$dir."lib/javaPlugin/player/skin.php?u=$tmp&s=35&v=f\"> <a href=\"$loc\">$tmp</a>";
 			}
 		}
 		if($row['reason'] == null)

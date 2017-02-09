@@ -8,9 +8,8 @@ foreach ($_POST as $key => $value) {
     $_POST[$key] = htmlspecialchars($value, ENT_QUOTES,"UTF-8");
 }
 			session_start();
-			include_once ($_SESSION['DIR']."lib/mySQL/MySQL.php");
 			include($_SESSION['DIR']."lib/configuration/config.php");
-			include($_SESSION['DIR']."lib/javaPlugin/player/PlayerCache.php");
+			include($_SESSION['DIR']."lib/user/User.php");
 			$dir = $_SESSION['HTTP_DIR'];
 			$mySQL = new MySQL();
 			$con = $mySQL->getConnection();
@@ -94,7 +93,7 @@ foreach ($_POST as $key => $value) {
 		$pdo = $con;
 		$start  = $_POST['start'];
 		$end = $_POST['end'];
-		$std = $pdo->prepare($base.$suffix." LIMIT $start, $end ");
+		$std = $pdo->prepare($base.$suffix."  ORDER BY ID DESC LIMIT $start, $end");
 		$std->execute();
 			$name = "";
 			$count_row = 0;
@@ -104,7 +103,7 @@ foreach ($_POST as $key => $value) {
 		{
 			$name = $PC->getPlayerName($row['UUID']);
 			$real_UUID = $row['UUID'];
-			$tmp = $dir."user.php"."?name=".$name;
+			$tmp = $dir."?UUID=".$real_UUID;
 		$UUID = "<img src=\"".$dir."lib/javaPlugin/player/skin.php?u=$name&s=35&v=f\"> <a href=\"$tmp\">$name</a>";
 		switch($row['status']){
 			case "banned":
@@ -129,11 +128,11 @@ foreach ($_POST as $key => $value) {
 		}else{
 			if($row['byUUID'] == "CONSOLE")
 			{
-				$loc = $dir."staff.php"."?name=CONSOLE";
+				$loc = $dir."?STAFF_UUID=CONSOLE";
 				$by = "<img src=\"".$dir."lib/javaPlugin/player/skin.php?u=Hack&s=35&v=f\"> <a href=\"$loc\">CONSOLE</a>";
 			}else{
-			$tmp =  $PC->getPlayerName($row['byUUID']);
-				$loc = $dir."staff.php"."?name=".$tmp;
+				$tmp =  $PC->getPlayerName($row['byUUID']);
+				$loc = $dir."?STAFF_UUID=".$row['byUUID'];
 				$by = "<img src=\"".$dir."lib/javaPlugin/player/skin.php?u=$tmp&s=35&v=f\"> <a href=\"$loc\">$name</a>";
 			}
 		}

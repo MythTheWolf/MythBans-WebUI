@@ -1,10 +1,13 @@
 <?php
+//error_reporting(E_ALL);
+//ini_set('display_errors', 1);
 include ("lib/mySQL/MySQL.php");
 include ("lib/user/LibUser.php");
-include ("lib/javaPlugin/PlayerCache.php");
+include ("lib/javaPlugin/player/Player.php");
 $mySQL = new MySQL();
 $con = $mySQL -> getConnection();
 $PC = new PlayerCache($con);
+$player = new Player($con);
 $d = dirname($_SERVER['SCRIPT_FILENAME']) . '/';
 if ($con == null) {
 	die("
@@ -67,7 +70,7 @@ $_SESSION['HTTP_DIR'] = $dir;
 
 	 </script>
 	<center>
-		<img src="lib/static/image/system-default.png">
+		<a href="<?php echo $dir ?>"><img src="lib/static/image/system-default.png"></a>
 	</center>
 	<nav class="navbar navbar-default">
   <div class="container-fluid">
@@ -79,7 +82,7 @@ $_SESSION['HTTP_DIR'] = $dir;
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#"><?php echo $config['SERVER-NAME'];
+      <a class="navbar-brand" href="<?php echo $dir ?>"><?php echo $config['SERVER-NAME'];
 		echo $user['isLoggedIn'];
  ?></a>
     </div>
@@ -127,6 +130,9 @@ $_SESSION['HTTP_DIR'] = $dir;
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
+<form id="GET">
+	<input id="getUserUUID" name="getUserUUID" hidden>
+</form>
 <center>
 	<?php
 	if($alt != true){
@@ -134,13 +140,37 @@ $_SESSION['HTTP_DIR'] = $dir;
 	<h3>Live Stats</h3>
 	<?php 
 	}else if(isset($_GET['UUID'])){
+		$username = $PC->getPlayerName($_GET['UUID']);
 	?>
-	<h3>User profile of <?php echo $PC->getPlayerName($_GET['UUID']); ?></h3> 
+	<h3><?php echo $player->getStatusHTML($_GET['UUID'])." ".$username; ?></h3> 
+	<?php echo "<img src='lib/javaPlugin/player/full_skin.php?u=$username' />"; ?>
+	<center>
+		<h4>Total Bans: <?php echo $player->getAmountBanned($_GET['UUID']); ?></h4>
+	</center>
+	
+		<div id="alt_results">
+			
+		</div>
+		
+		<script>
+		<?php
+		$uuid = htmlspecialchars($_GET['UUID']);
+		?>
+			$.ajax({
+				type : "POST",
+				url : "lib/AJAX/getUser.php?UUID=<?php echo $uuid ?>",
+				data : $("#GET").serialize(),
+				success : function(result) {
+					
+					$("#alt_results").html(result);
+				}
+			});
+		</script>
 	<?php
 	}
 	?>
 </center>
-<div id="example" name="example"></div>
+<div id="example" name="example">
  <table class="table table-striped">
  	<?php
  	if($alt != true)
@@ -452,6 +482,7 @@ $_SESSION['HTTP_DIR'] = $dir;
  
 	</div>	 
 	    </table>
+	    </div>
 	    <div id="loader">
  		<center>
  			<img src="lib/AJAX/CSS/loading.gif" id="target" class="target">
@@ -574,7 +605,7 @@ $_SESSION['HTTP_DIR'] = $dir;
 			});
 		});
 		$("#actionType").change(function(event) {
-
+				$("#resultTable").html("<center><img src=\"lib/AJAX/CSS/loading.gif\"></center>");
 			$.ajax({
 				type : "POST",
 				url : "lib/AJAX/getStats.php",
@@ -630,7 +661,7 @@ $_SESSION['HTTP_DIR'] = $dir;
 				triggerModal(this.id);
 			});
 			$(".permaLink").click(function() {
-				alert("ll");
+				
 				getPermaLink(this.id);
 			});
 			$(".moreOptionsButton").click(function() {
