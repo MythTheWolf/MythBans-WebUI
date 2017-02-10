@@ -57,7 +57,9 @@ foreach ($_POST as $key => $value) {
 					break;
 				case "Probation":
 					$act = "trial";
+					break;
 				case "OK":
+					break;
 					$act = "OK";
 			}
 			if($count > 0)
