@@ -91,9 +91,10 @@ foreach ($_POST as $key => $value) {
 		}
 		try{
 		$pdo = $con;
-		$start  = $_POST['start']+1;
+		$start  = $_POST['start'];
 		$end = $_POST['end'];
-		$std = $pdo->prepare($base.$suffix."  ORDER BY ID DESC LIMIT $start, $end");
+		$std = $pdo->prepare($base.$suffix."  ORDER BY ID DESC LIMIT 5 OFFSET $start");
+		echo $base.$suffix."  ORDER BY ID DESC LIMIT 5 OFFSET $start";
 		$std->execute();
 			$name = "";
 			$count_row = 0;

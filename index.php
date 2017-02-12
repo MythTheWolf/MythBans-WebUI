@@ -536,24 +536,21 @@ $_SESSION['HTTP_DIR'] = $dir;
 			$("#start").val("0");
 			$("#end").val("5");
 			$("#loadMore").click(function() {
-				var old_start = parseInt($("#start").val(), 10);
-				$("#start").val(old_start + 5);
-				var old_end = parseInt($("#end").val(), 10);
-				$("#end").val(old_end + 5);
-				$("html, body").animate({
-					scrollTop : $(document).height()
-				}, 1000);
+				var old_start = parseInt($("#start").val());
+				$("#start").val(old_start+5);
+				var old_end = parseInt($("#end").val());
+				$("#end").val(old_end);
 				$.ajax({
 					type : "POST",
 					url : "lib/AJAX/getMoreStats.php",
 					data : $('#filters').serialize(),
 					success : function(result) {
-
 						$("table tbody").append(result);
 						$("html, body").animate({
 							scrollTop : $(document).height()
 						}, 1000);
 					}
+					
 				});
 
 			});
