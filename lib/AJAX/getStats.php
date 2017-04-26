@@ -134,6 +134,9 @@ foreach ($_POST as $key => $value) {
 			case "OK": 
 				$status = "<span class=\"label label-success\">Active</span>";
 				break;
+			default:
+				$status = "<span class=\"label label-primary\">Active</span>";
+				break;
 		}
 		if($row['byUUID'] == null)
 		{
